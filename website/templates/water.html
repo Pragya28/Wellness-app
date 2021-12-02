@@ -36,10 +36,11 @@ content %}
     </div>
 
     <form method="post">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
       <div class="form-group mb-3 row">
         <div class="col-sm-2">
           <label for="calories" class="col-form-label">
-            Glasses of water consumed today
+            Water consumed today
           </label>
         </div>
         <div class="col-sm-10">
@@ -48,12 +49,9 @@ content %}
             name="water"
             id="water"
             class="form-control"
-            placeholder="Enter your water intake (in glasses)"
+            placeholder="Enter your approximate water (in ml)"
             required
           />
-          <div class="form-text">
-            Assuming volume of each glass of water to be 250ml
-          </div>
         </div>
       </div>
       <button type="submit" class="btn btn-primary" value="submit">

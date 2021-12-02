@@ -41,6 +41,7 @@
         </ul>
         <div class="container-fluid text-center">
           <form action="" method="post">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
             <button
               type="submit"
               class="btn btn-primary"

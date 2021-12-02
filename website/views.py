@@ -3,7 +3,7 @@ from flask_login import login_required, current_user
 from datetime import date
 from .models import CalorieData, Data
 from . import db
-from .calculations import calculate_calories, calculate_water
+from .calculations import calculate_sleeping_time, calculate_calories_burned, total_calories
 
 views = Blueprint('views', __name__)
 
@@ -54,69 +54,61 @@ def bmi():
 @views.route('/calorie', methods=["GET", "POST"])
 @login_required
 def calorie():
+    old_data = CalorieData.query.filter_by(user_id=current_user.id, date=date.today())
+    total = total_calories(old_data)
     if request.method == "POST":
-        exercise = request.form.get("exercise")
-        duration = request.form.get("duration")
-        calories = request.form.get("calories")
-        
-        data = CalorieData.query.filter_by(user_id=current_user.id, date=date.today(), exercise=exercise).first()
-
-        if data:
-            flash("You have already recorded data for this exercise today.", category="error")
+        task = request.form.get("met-option")
+        duration = int(request.form.get("duration"))
+        if task in "":
+            flash("Select activity - if desired activity is not available select the one which seems nearest", "error")
         else:
-            data = CalorieData(exercise, duration, calories)
+            met_val = float(task.split("-")[-1])
+            cal = calculate_calories_burned(met_val, current_user.bmr, duration)
+            task = task.replace("_"," ")[:task.index("-")]
+            data = CalorieData(task, duration, cal)
             db.session.add(data)
             db.session.commit()
-            flash("Your exercise is recorded.", category="success")
-                
-    old_data = CalorieData.query.filter_by(user_id=current_user.id, date=date.today()).all()
-    total = calculate_calories(old_data)
-
-    data = Data.query.filter_by(user_id=current_user.id, date=date.today()).first()
-
-    if data:
-        data.add_calorie(total)
-        db.session.commit()
-        flash(UPDATE_MSG, category="success")
-    else:
-        data = Data(current_user.id)
-        data.add_calorie(total)
-        db.session.add(data)
-        db.session.commit()
-        flash(SAVE_MSG, category="success")
-
+            flash(SAVE_MSG, category="success")
+        
     return render_template("calorie.html", user=current_user, data=old_data, total=total)
 
 @views.route('/sleep', methods=["GET", "POST"])
 @login_required
 def sleep():
     if request.method == "POST":
-        hours = request.form.get("sleep")
+        sleep_time = request.form.get("sleep-time")
+        wakeup_time = request.form.get("wakeup-time")
+        duration = calculate_sleeping_time(sleep_time, wakeup_time)
+        hrs = duration['hrs']
+        mins = duration['mins']
         data = Data.query.filter_by(user_id=current_user.id, date=date.today()).first()
         if data:
-            data.add_sleep(hours)
+            data.add_sleep(duration['total'])
             db.session.commit()
             flash(UPDATE_MSG, category="success")
         else:
             data = Data(current_user.id)
-            data.add_sleep(hours)
+            data.add_sleep(duration['total'])
             db.session.add(data)
             db.session.commit()
             flash(SAVE_MSG, category="success")
     else:
         data = Data.query.filter_by(user_id=current_user.id, date=date.today()).first()
         if data:
-            hours = data.sleep
+            duration = data.sleep
+            hrs = duration//60
+            mins = duration%60
         else:
-            hours = 0
-    return render_template("sleep.html", user=current_user, hours=hours)
+            hrs = 0
+            mins = 0
+            
+    return render_template("sleep.html", user=current_user, hours=hrs, mins=mins)
 
 @views.route('/water', methods=["GET", "POST"])
 @login_required
 def water():
     if request.method == "POST":
-        glass = request.form.get("water")
-        amt = calculate_water(glass)
+        amt = int(request.form.get("water"))/1000
         data = Data.query.filter_by(user_id=current_user.id, date=date.today()).first()
         if data:
             data.add_water(amt)

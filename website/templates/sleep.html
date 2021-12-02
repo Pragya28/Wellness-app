@@ -32,22 +32,37 @@ block content %}
     </ul>
     <br />
     <div class="text-center">
-      {% if hours %} You slept {{hours}} hours today {% endif %}
+      {% if hours %} You slept {{hours}} hours {{mins}} minutes today {% endif
+      %}
     </div>
     <form method="post">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
       <div class="form-group mb-3 row">
         <div class="col-sm-2">
-          <label for="sleep" class="col-form-label">
-            Hours you slept today
-          </label>
+          <label for="sleep-time" class="col-form-label"> Sleeping Time </label>
         </div>
         <div class="col-sm-10">
           <input
-            type="number"
-            name="sleep"
-            id="sleep"
+            type="time"
+            name="sleep-time"
+            id="sleep-time"
             class="form-control"
-            placeholder="Enter number of hours you slept"
+            placeholder="Enter your sleeping time"
+            required
+          />
+        </div>
+      </div>
+      <div class="form-group mb-3 row">
+        <div class="col-sm-2">
+          <label for="wakeup-time" class="col-form-label"> Wake up Time </label>
+        </div>
+        <div class="col-sm-10">
+          <input
+            type="time"
+            name="wakeup-time"
+            id="wakeup-time"
+            class="form-control"
+            placeholder="Enter your wake up time"
             required
           />
         </div>

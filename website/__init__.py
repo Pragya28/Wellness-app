@@ -2,9 +2,11 @@ from flask import Flask
 from os import path, environ, remove, makedirs
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
+from flask_wtf.csrf import CSRFProtect
 import json
 
 db = SQLAlchemy()
+csrf = CSRFProtect()
 
 def create_app(test_config=None):
     app = Flask(__name__)
@@ -18,7 +20,9 @@ def create_app(test_config=None):
         app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_name}'
 
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    
     db.init_app(app)
+    csrf.init_app(app)
 
     from .views import views
     from .auth import auth

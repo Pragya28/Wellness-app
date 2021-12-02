@@ -2,7 +2,7 @@ from . import db
 from flask_login import UserMixin
 from datetime import date
 from werkzeug.security import generate_password_hash, check_password_hash
-from .calculations import calculate_bmi
+from .calculations import calculate_bmi, calculate_bmr
 from flask_login import current_user
 
 class User(db.Model, UserMixin):
@@ -16,10 +16,12 @@ class User(db.Model, UserMixin):
     join_date = db.Column(db.Date)
     height = db.Column(db.Float)
     weight = db.Column(db.Float)
+    lifestyle = db.Column(db.String(20))
     bmi = db.Column(db.Float)
+    bmr = db.Column(db.Float)
     wellness = db.Column(db.Float, default=0.0)
 
-    def __init__(self, username, email, password, fullname, gender, age, height, weight):
+    def __init__(self, username, email, password, fullname, gender, age, height, weight, lifestyle):
         self.username = username
         self.email = email
         self.password = generate_password_hash(password)
@@ -28,8 +30,10 @@ class User(db.Model, UserMixin):
         self.age = age
         self.height = height
         self.weight = weight
+        self.lifestyle = lifestyle
         self.join_date = date.today()
         self.bmi = calculate_bmi(height, weight)
+        self.bmr = calculate_bmr(height, weight, age, gender)
 
 
 class CalorieData(db.Model):

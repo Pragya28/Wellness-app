@@ -3,7 +3,7 @@ from .models import User
 from werkzeug.security import generate_password_hash, check_password_hash
 from . import db
 from flask_login import login_user, login_required, logout_user, current_user
-from .calculations import calculate_bmi
+
 
 auth = Blueprint('auth', __name__)
 
@@ -48,6 +48,8 @@ def signup():
         gender = request.form.get('genderOptions')
         height = int(request.form.get('height'))
         weight = int(request.form.get('weight'))
+        lifestyle = request.form.get('lifestyle')    
+
         userbyusername = User.query.filter_by(username=username).first()
         userbyemail = User.query.filter_by(email=email).first()
 
@@ -76,7 +78,7 @@ def signup():
             message = "Select your gender"
             flash(message, category="error")
         else:
-            user = User(username, email, pwd1, fullname, gender, age, height, weight)
+            user = User(username, email, pwd1, fullname, gender, age, height, weight, lifestyle)
             db.session.add(user)
             db.session.commit()
             login_user(user, remember=True)

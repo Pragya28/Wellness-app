@@ -7,6 +7,7 @@ coverage==6.1.2
 Flask==2.0.2
 Flask-Login==0.5.0
 Flask-SQLAlchemy==2.5.1
+Flask-WTF==1.0.0
 greenlet==1.1.2
 gunicorn==20.1.0
 iniconfig==1.1.1
@@ -21,4 +22,6 @@ pyparsing==3.0.6
 pytest==6.2.5
 SQLAlchemy==1.4.27
 toml==0.10.2
+-e git+https://github.com/Pragya28/Wellness-app.git@cfaa5acc95a0e7f14ca7abf579b0928301fb3175#egg=website
 Werkzeug==2.0.2
+WTForms==3.0.0
